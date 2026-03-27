@@ -1,6 +1,6 @@
 public class BST<E extends Comparable<E>> implements Tree<E> {
-
-    // ── Inner node class ──────────────────────────────────────────────────
+    
+      // ── Inner node class ──────────────────────────────────────────────────
     protected static class TreeNode<E> {
         E element;
         TreeNode<E> left;
@@ -82,69 +82,62 @@ public class BST<E extends Comparable<E>> implements Tree<E> {
         // Step 1: find the node -- same path as search, tracking parent
         TreeNode<E> parent  = null;
         TreeNode<E> current = root;
-
+        
         while (current != null) {
             int cmp = e.compareTo(current.element);
             if      (cmp < 0) { parent = current; current = current.left; }
             else if (cmp > 0) { parent = current; current = current.right; }
             else break; // found
         }
-
+        
         if (current == null) return false; // not found
-
         // Step 2: determine which case applies and handle it
         // TODO Case 1: current has no children
-
-        if(current.left == null && current.right == null){
-
-            if (current == root){ //   -- handle the special case where current is the root
-                current = null;
-            }
-
-            if (current.element.compareTo(parent.element) < 0){ //   -- set parent's left or right to null
-                parent.left = null;
-            } else if(current.element.compareTo(parent.element) > 0){
-                parent.right = null;
-            } else {
-                parent = null;
-            }
-        }
-
-
-        // TODO Case 2: current has one child
-        //   -- set parent's pointer to current's only child
         //   -- handle the special case where current is the root
-        if(current.left != null || current.right != null){
-            if(current.right == null){
-                parent = current.left;
-            } else if(current.left == null){
-                parent = current.right;
+        
+        if(current.left == null && current.right == null){
+            
+            if (parent.left == current){ //   -- set parent's left or right to null
+                parent.left = null;
             }
-            if(current == root){
-                current = null;
+            else {
+                parent.right = null;
+            }
+            
+        } 
+        
+        // TODO Case 2: current has one child
+        //   -- handle the special case where current is the root
+        
+        if (current.left == null || current.right == null){
+            //   -- set parent's pointer to current's only child
+            if (parent == null){
+                root = current.right;
+            }
+            else {
+                if (e.compareTo(parent.element) < 0){
+                    parent.left = current.left;
+                } else {
+                    parent.right = current.right;
+                }
             }
         }
-
         // TODO Case 3: current has two children
         //   -- find the in-order successor: go right once, then left as far as possible
         //   -- copy successor's value into current
         //   -- delete the successor (it has at most one child, so Case 1 or 2)
-
-
-        if(current.left != null && current.right != null){
-
-            TreeNode<E> succesor = current.right;
-
-            while( succesor != null){
-                succesor = succesor.left;
+        TreeNode<E> parentOfRightMost = current;
+        TreeNode<E> rightMost = current;
+            while (rightMost.right != null){
+                parentOfRightMost = rightMost;
             }
-            current = succesor; // null
-
-            // delet succesour if case 1 or case 2
-
-
-        }
-
+            current.element = rightMost.element;
+            if (parentOfRightMost.right == rightMost){
+                parentOfRightMost.right = rightMost.left;
+            } else {
+                parentOfRightMost.left = rightMost.left;
+            }
+        
         // TODO: decrement size and return true
         size--;
         return true;
@@ -168,38 +161,30 @@ public class BST<E extends Comparable<E>> implements Tree<E> {
 
 
     // ── Preorder traversal ────────────────────────────────────────────────
-    @Override
+   @Override
     public void preorder() {
         preorder(root);
     }
 
-    private void preorder(TreeNode<E> node) {
-        // TODO: implement preorder traversal (visit -> left -> right)
-        // Base case: if node is null, return.
-        if (root == null) {
-            return;
-        }
-
-        System.out.print(root.element + " ");
-        inorder(root.left);
-        inorder(root.right);
+    private void preorder(TreeNode<E> root) {
+    if (root == null) return;           // base case: empty subtree
+    System.out.print(root.element + " "); // visit first
+    preorder(root.left);                  // then left
+    preorder(root.right);                 // then right
     }
-
 
 
 
     // ── Postorder traversal ───────────────────────────────────────────────
-    @Override
+   @Override
     public void postorder() {
         postorder(root);
     }
 
-    private void postorder(TreeNode<E> node) {
+    private void postorder(TreeNode<E> root) {
         // TODO: implement postorder traversal (left -> right -> visit)
         // Base case: if node is null, return.
-        if (root == null) {
-            return;
-        }
+        if (root == null) return;
 
         inorder(root.left);
         inorder(root.right);
@@ -211,7 +196,7 @@ public class BST<E extends Comparable<E>> implements Tree<E> {
 
 
     // ── Size and empty ────────────────────────────────────────────────────
-    @Override
+   @Override
     public int getSize() {
         return size;
     }
@@ -220,9 +205,10 @@ public class BST<E extends Comparable<E>> implements Tree<E> {
     public boolean isEmpty() {
         return size == 0;
     }
+    
 
 
-
+ 
 
 
 
@@ -263,4 +249,5 @@ public class BST<E extends Comparable<E>> implements Tree<E> {
         // Size
         System.out.println("Size: " + tree.getSize());  // 4
     }
+
 }
